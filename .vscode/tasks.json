@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Clean and Build Solution",
+      "type": "shell",
+      "command": "dotnet clean \"VoidFiend Nexus.sln\" && dotnet build \"VoidFiend Nexus.sln\" -c Release",
+      "isBackground": false,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    }
+  ]
+}
