@@ -2074,16 +2074,16 @@ namespace VoidSurvivorColorMod
         public const string PluginVersion = "1.0.0";
 
         // Individual color controls for each component
-        private static readonly Color pointLightColor = new Color(1f, 0.501f, 1f, 1f);
+        private static readonly Color pointLightColor = new Color(0.471f, 0f, 1f, 0.150f);
         private static readonly Color brightFlashColor = new Color(1f, 0.2968f, 1f, 1f);
-        private static readonly Color muzzleflashPointLightColor = new Color(1f, 0.501f, 1f, 1f);
+        private static readonly Color muzzleflashPointLightColor = new Color(0.471f, 0f, 1f, 0.150f);
 
         // New color controls for additional effects
-        private static readonly Color megaBlasterBigGhostPointLightColor = new Color(1f, 0.501f, 1f, 1f);
-        private static readonly Color chargeMegaBlasterPointLightColor = new Color(1f, 0.501f, 1f, 1f);
-        private static readonly Color readyMegaBlasterPointLightColor = new Color(1f, 0.501f, 1f, 1f);
-        private static readonly Color voidBlinkVfxPointLightColor = new Color(1f, 0.501f, 1f, 1f);
-        private static readonly Color megaBlasterSmallGhostPointLightColor = new Color(1f, 0.501f, 1f, 1f);
+        private static readonly Color megaBlasterBigGhostPointLightColor = new Color(0.471f, 0f, 1f, 0.150f);
+        private static readonly Color chargeMegaBlasterPointLightColor = new Color(0.471f, 0f, 1f, 0.150f);
+        private static readonly Color readyMegaBlasterPointLightColor = new Color(0.471f, 0f, 1f, 0.150f);
+        private static readonly Color voidBlinkVfxPointLightColor = new Color(0.471f, 0f, 1f, 0.150f);
+        private static readonly Color megaBlasterSmallGhostPointLightColor = new Color(0.471f, 0f, 1f, 0.150f);
 
         // FIX: Add dictionaries to store original colors to prevent permanent asset modification.
         private readonly Dictionary<Light, Color> originalLightColors = new Dictionary<Light, Color>();
