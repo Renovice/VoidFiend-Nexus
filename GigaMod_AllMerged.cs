@@ -38,9 +38,9 @@ using MonoMod.Cil;
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                          MOD 1: SUPPRESS REWORK                           ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██                         MOD 1: SUPPRESS REWORK                              ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
 
@@ -551,7 +551,7 @@ namespace SuppressRework
 
                         // AEGIS SUPPORT: Check if we have Aegis item
                         bool hasAegis = characterBody.inventory != null &&
-                                       characterBody.inventory.GetItemCount(RoR2Content.Items.BarrierOnOverHeal) > 0;
+                                        characterBody.inventory.GetItemCount(RoR2Content.Items.BarrierOnOverHeal) > 0;
 
                         if (hasAegis)
                         {
@@ -911,9 +911,9 @@ namespace SuppressRework
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                          MOD 2: VOID FIEND BEAM                           ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██                         MOD 2: VOID FIEND BEAM                              ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
 
@@ -1300,9 +1300,9 @@ namespace VoidFiendBeam
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                        MOD 3: VOID VFX UPDATE                             ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██                         MOD 3: VOID VFX UPDATE                              ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
 
@@ -1466,9 +1466,9 @@ namespace VoidRampSwitcher
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                      MOD 4: OMNISPARK PREFAB CHANGE                       ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██                   MOD 4: OMNISPARK PREFAB CHANGE                            ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
 
@@ -1581,7 +1581,7 @@ public class VoidModeMuzzleflashPlugin : BaseUnityPlugin
         // The buff is typically named "bdVoidSurvivorCorruptMode" or similar
         corruptedBuffDef = Resources.FindObjectsOfTypeAll<BuffDef>()
             .FirstOrDefault(buff => buff.name.Contains("VoidSurvivorCorrupt") ||
-                                  buff.name.Contains("bdVoidSurvivorCorruptMode"));
+                                    buff.name.Contains("bdVoidSurvivorCorruptMode"));
 
         if (corruptedBuffDef)
         {
@@ -1693,9 +1693,9 @@ public class VoidModeMuzzleflashPlugin : BaseUnityPlugin
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                      MOD 5: BILLBOARD FIRE EDITOR                         ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██                       MOD 5: BILLBOARD FIRE EDITOR                          ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
 
@@ -1772,6 +1772,7 @@ namespace VoidSurvivorCustomFlame
             {
                 foreach (var mat in createdMaterials)
                 {
+                    // FIX: Add a null check for robustness. The material might have been destroyed by Unity during scene unload.
                     if (mat != null)
                     {
                         UnityEngine.Object.Destroy(mat);
@@ -1781,6 +1782,7 @@ namespace VoidSurvivorCustomFlame
 
                 foreach (var tex in createdTextures)
                 {
+                    // FIX: Add a null check for robustness.
                     if (tex != null)
                     {
                         UnityEngine.Object.Destroy(tex);
@@ -2056,9 +2058,9 @@ namespace VoidSurvivorCustomFlame
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                MOD 6: VOID SURVIVOR BEAM IMPACT COLOR CHANGE              ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██               MOD 6: VOID SURVIVOR BEAM IMPACT COLOR CHANGE                 ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
 
@@ -2082,6 +2084,12 @@ namespace VoidSurvivorColorMod
         private static readonly Color readyMegaBlasterPointLightColor = new Color(1f, 0.501f, 1f, 1f);
         private static readonly Color voidBlinkVfxPointLightColor = new Color(1f, 0.501f, 1f, 1f);
         private static readonly Color megaBlasterSmallGhostPointLightColor = new Color(1f, 0.501f, 1f, 1f);
+
+        // FIX: Add dictionaries to store original colors to prevent permanent asset modification.
+        private readonly Dictionary<Light, Color> originalLightColors = new Dictionary<Light, Color>();
+        private readonly Dictionary<ParticleSystem, Color> originalParticleStartColors = new Dictionary<ParticleSystem, Color>();
+        private readonly Dictionary<ParticleSystem, ParticleSystem.MinMaxGradient> originalParticleGradients = new Dictionary<ParticleSystem, ParticleSystem.MinMaxGradient>();
+
 
         private void Awake()
         {
@@ -2190,9 +2198,13 @@ namespace VoidSurvivorColorMod
 
                 if (pointLight != null)
                 {
-                    Color originalColor = pointLight.color;
+                    // FIX: Store the original color before changing it
+                    if (!originalLightColors.ContainsKey(pointLight))
+                    {
+                        originalLightColors[pointLight] = pointLight.color;
+                    }
                     pointLight.color = pointLightColor;
-                    Logger.LogInfo($"Changed Point Light color from {originalColor} to {pointLightColor}");
+                    Logger.LogInfo($"Changed Point Light color from {originalLightColors[pointLight]} to {pointLightColor}");
                 }
                 else
                 {
@@ -2217,16 +2229,25 @@ namespace VoidSurvivorColorMod
                 if (particleSystem != null)
                 {
                     var main = particleSystem.main;
-                    Color originalColor = main.startColor.color;
+                    // FIX: Store the original color before changing it
+                    if (!originalParticleStartColors.ContainsKey(particleSystem))
+                    {
+                        originalParticleStartColors[particleSystem] = main.startColor.color;
+                    }
                     main.startColor = brightFlashColor;
-                    Logger.LogInfo($"Changed BrightFlash particle system color from {originalColor} to {brightFlashColor}");
+                    Logger.LogInfo($"Changed BrightFlash particle system color from {originalParticleStartColors[particleSystem]} to {brightFlashColor}");
 
                     // Also modify the color over lifetime module if it exists
                     var colorOverLifetime = particleSystem.colorOverLifetime;
                     if (colorOverLifetime.enabled)
                     {
-                        Gradient gradient = new Gradient();
+                        // FIX: Store original gradient
+                        if (!originalParticleGradients.ContainsKey(particleSystem))
+                        {
+                            originalParticleGradients[particleSystem] = colorOverLifetime.color;
+                        }
 
+                        Gradient gradient = new Gradient();
                         // Create a gradient that starts with our desired color and fades out
                         GradientColorKey[] colorKeys = new GradientColorKey[2];
                         colorKeys[0].color = brightFlashColor;
@@ -2333,9 +2354,13 @@ namespace VoidSurvivorColorMod
 
                 if (pointLight != null)
                 {
-                    Color originalColor = pointLight.color;
+                    // FIX: Store the original color before changing it
+                    if (!originalLightColors.ContainsKey(pointLight))
+                    {
+                        originalLightColors[pointLight] = pointLight.color;
+                    }
                     pointLight.color = muzzleflashPointLightColor;
-                    Logger.LogInfo($"Changed VoidSurvivorBeamMuzzleflash Point Light color from {originalColor} to {muzzleflashPointLightColor}");
+                    Logger.LogInfo($"Changed VoidSurvivorBeamMuzzleflash Point Light color from {originalLightColors[pointLight]} to {muzzleflashPointLightColor}");
                 }
                 else
                 {
@@ -2475,9 +2500,13 @@ namespace VoidSurvivorColorMod
 
                 if (pointLight != null)
                 {
-                    Color originalColor = pointLight.color;
+                    // FIX: Store the original color before changing it
+                    if (!originalLightColors.ContainsKey(pointLight))
+                    {
+                        originalLightColors[pointLight] = pointLight.color;
+                    }
                     pointLight.color = newColor;
-                    Logger.LogInfo($"Changed {prefabContext} Point Light color from {originalColor} to {newColor}");
+                    Logger.LogInfo($"Changed {prefabContext} Point Light color from {originalLightColors[pointLight]} to {newColor}");
                 }
                 else
                 {
@@ -2494,6 +2523,33 @@ namespace VoidSurvivorColorMod
         {
             // Clean up hooks
             On.RoR2.EffectCatalog.Init -= EffectCatalog_Init;
+            
+            // FIX: Restore all original colors to prevent asset state pollution
+            Logger.LogInfo("Restoring original colors to all modified assets...");
+            foreach(var pair in originalLightColors)
+            {
+                if(pair.Key != null) // Check if the component hasn't been destroyed
+                {
+                    pair.Key.color = pair.Value;
+                }
+            }
+            foreach(var pair in originalParticleStartColors)
+            {
+                if(pair.Key != null)
+                {
+                    var main = pair.Key.main;
+                    main.startColor = pair.Value;
+                }
+            }
+            foreach(var pair in originalParticleGradients)
+            {
+                if(pair.Key != null)
+                {
+                    var col = pair.Key.colorOverLifetime;
+                    col.color = pair.Value;
+                }
+            }
+            Logger.LogInfo("Original asset colors restored.");
         }
 
         // Helper: tolerant child lookup
@@ -2527,8 +2583,8 @@ namespace VoidSurvivorColorMod
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                            END OF GIGA MOD                                ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██                             END OF GIGA MOD                                 ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
