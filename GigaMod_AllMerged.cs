@@ -77,16 +77,17 @@ namespace SuppressRework
             try
             {
                 // --- BIND CONFIGURATION WITH RENOVICE'S REQUESTED DEFAULTS ---
-                EnableAllOrNothingScaling = Config.Bind("Main", "Enable All-or-Nothing Scaling", false, "If true, the ability consumes your resource bar for a 1:1 reward. If false, it uses a fixed percentage.");
-                EnableEfficientTrades = Config.Bind("Main", "Enable Efficient Trades", true, "If true, the ability will not spend more resources than needed to fill the target bar.");
-                MaxHealthSacrifice = Config.Bind("All-or-Nothing Mode", "Max Health Sacrifice Percent", 50f, "When 'All-or-Nothing' is ON, this is the MAXIMUM percentage of your health you can sacrifice in one go.");
-                FixedTradeValue = Config.Bind("Fixed Trade Mode", "Fixed Trade Percentage", 35f, "When 'All-or-Nothing' is OFF, this is the percentage of health/corruption that will be traded.");
+                // All settings live under a single 'Supressrework' section (charges merged into the same menu)
+                EnableAllOrNothingScaling = Config.Bind("Supressrework", "Enable All-or-Nothing Scaling", false, "If true, the ability consumes your resource bar for a 1:1 reward. If false, it uses a fixed percentage.");
+                EnableEfficientTrades = Config.Bind("Supressrework", "Enable Efficient Trades", true, "If true, the ability will not spend more resources than needed to fill the target bar.");
+                MaxHealthSacrifice = Config.Bind("Supressrework", "Max Health Sacrifice Percent", 50f, "When 'All-or-Nothing' is ON, this is the MAXIMUM percentage of your health you can sacrifice in one go.");
+                FixedTradeValue = Config.Bind("Supressrework", "Fixed Trade Percentage", 35f, "When 'All-or-Nothing' is OFF, this is the percentage of health/corruption that will be traded.");
 
-                // Charge configuration with Renovice's requested defaults
-                MaxChargesNormalMode = Config.Bind("Charge Settings", "Max Charges - Suppress", 1, "Maximum charges for the suppress ability (spend corruption to heal in normal mode). No cooldown - you get this many per transformation.");
-                MaxChargesCorruptedMode = Config.Bind("Charge Settings", "Max Charges - Corrupted Suppress", 2, "Maximum charges for the corrupted suppress ability (sacrifice health for corruption in void mode). No cooldown - you get this many per transformation.");
-                InfiniteChargesNormalMode = Config.Bind("Charge Settings", "Infinite Charges - Suppress", true, "If true, suppress ability has infinite charges in normal mode.");
-                InfiniteChargesCorruptedMode = Config.Bind("Charge Settings", "Infinite Charges - Corrupted Suppress", false, "If true, corrupted suppress ability has infinite charges in void mode.");
+                // Charge configuration (moved into same 'Supressrework' section)
+                MaxChargesNormalMode = Config.Bind("Supressrework", "Max Charges - Suppress", 1, "Maximum charges for the suppress ability (spend corruption to heal in normal mode). No cooldown - you get this many per transformation.");
+                MaxChargesCorruptedMode = Config.Bind("Supressrework", "Max Charges - Corrupted Suppress", 2, "Maximum charges for the corrupted suppress ability (sacrifice health for corruption in void mode). No cooldown - you get this many per transformation.");
+                InfiniteChargesNormalMode = Config.Bind("Supressrework", "Infinite Charges - Suppress", true, "If true, suppress ability has infinite charges in normal mode.");
+                InfiniteChargesCorruptedMode = Config.Bind("Supressrework", "Infinite Charges - Corrupted Suppress", false, "If true, corrupted suppress ability has infinite charges in void mode.");
 
                 // --- SET UP RISK OF OPTIONS MENU ---
                 SetupRiskOfOptions();
@@ -947,19 +948,19 @@ namespace VoidFiendBeam
             BeamVfxYScale = Config.Bind("Beam Settings", "Beam VFX Height Scale", 1f, "The scale of the beam's visual effects (VFX) on the Y-axis. Base game default is 1.");
             BeamVfxZScale = Config.Bind("Beam Settings", "Beam VFX Length Scale", 3.25f, "The scale of the beam's visual effects (VFX) on the Z-axis. Base game default is 1.");
 
-            // New Laser Mode settings: separate toggles for Regular and Corrupt hand beams
-            LazerBeamModeRegular = Config.Bind("Laser Mode", "Enable Laser Mode (Regular Beam)", false, "Eliminates randomization for the regular hand beam, making it behave like a precise laser.");
-            LazerBeamModeCorrupt = Config.Bind("Laser Mode", "Enable Laser Mode (Corrupt Beam)", false, "Eliminates randomization for the corrupt hand beam, making it behave like a precise laser.");
-            EnableDebugLogging = Config.Bind("Debug", "Enable Debug Logging", false, "Enable detailed logging for troubleshooting.");
-            VfxSurfaceOffset = Config.Bind("VFX Settings", "Surface Offset", 0.2f, "How far to push VFX out from terrain surfaces to prevent clipping. Base: 0.2");
-            
+            // Laser Mode, Debug and VFX surface offset moved into the same 'Beam Settings' section
+            LazerBeamModeRegular = Config.Bind("Beam Settings", "Enable Laser Mode (Regular Beam)", false, "Eliminates randomization for the regular hand beam, making it behave like a precise laser.");
+            LazerBeamModeCorrupt = Config.Bind("Beam Settings", "Enable Laser Mode (Corrupt Beam)", false, "Eliminates randomization for the corrupt hand beam, making it behave like a precise laser.");
+            EnableDebugLogging = Config.Bind("Beam Settings", "Enable Debug Logging", false, "Enable detailed logging for troubleshooting.");
+            VfxSurfaceOffset = Config.Bind("Beam Settings", "Surface Offset", 0.2f, "How far to push VFX out from terrain surfaces to prevent clipping. Base: 0.2");
+
             ModSettingsManager.AddOption(new SliderOption(BeamVfxXScale, new SliderConfig() { min = 0.1f, max = 20f, FormatString = "{0:0.0}" }));
             ModSettingsManager.AddOption(new SliderOption(BeamVfxYScale, new SliderConfig() { min = 0.1f, max = 20f, FormatString = "{0:0.0}" }));
             ModSettingsManager.AddOption(new SliderOption(BeamVfxZScale, new SliderConfig() { min = 0.1f, max = 20f, FormatString = "{0:0.0}" }));
             // Beam range slider for corrupt hand beam
             ModSettingsManager.AddOption(new SliderOption(BeamRange, new SliderConfig() { min = 10f, max = 300f, FormatString = "{0:0}" }));
 
-            // Add Risk of Options entries for new settings
+            // Add Risk of Options entries for laser mode, debug, and vfx offset (all under Beam Settings section)
             ModSettingsManager.AddOption(new CheckBoxOption(LazerBeamModeRegular));
             ModSettingsManager.AddOption(new CheckBoxOption(LazerBeamModeCorrupt));
             ModSettingsManager.AddOption(new CheckBoxOption(EnableDebugLogging));
@@ -1496,7 +1497,7 @@ public class VoidModeMuzzleflashPlugin : BaseUnityPlugin
     /// </summary>
     public void Awake()
     {
-        // Load the custom texture from the embedded resource file.
+        // Load the custom texture from the embedded resource.
         LoadCustomTexture();
 
         // If the texture was loaded successfully, set up our hooks
@@ -1694,7 +1695,7 @@ public class VoidModeMuzzleflashPlugin : BaseUnityPlugin
 /*
  * ████████████████████████████████████████████████████████████████████████████████
  * ██                                                                             ██
- * ██                       MOD 5: BILLBOARD FIRE EDITOR                          ██
+ * ██               MOD 5: BILLBOARD FIRE EDITOR                          ██
  * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
@@ -2054,12 +2055,10 @@ namespace VoidSurvivorCustomFlame
 }
 
 
-
-
 /*
  * ████████████████████████████████████████████████████████████████████████████████
  * ██                                                                             ██
- * ██               MOD 6: VOID SURVIVOR BEAM IMPACT COLOR CHANGE                 ██
+ * ██                         MOD 6: VOID SURVIVOR BEAM IMPACT COLOR CHANGE                 ██
  * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
@@ -2394,8 +2393,6 @@ namespace VoidSurvivorColorMod
 
 
 
-
-
         private void ModifyVoidSurvivorMegaBlasterBigGhost()
         {
             GameObject prefab = FindEffectPrefab("VoidSurvivorMegaBlasterBigGhost");
@@ -2575,7 +2572,7 @@ namespace VoidSurvivorColorMod
 
         // Helper: tolerant child lookup
         // Searches all children (including inactive) and matches by name case-insensitively.
-        // Also strips trailing ' (n)' suffixes Unity sometimes appends (e.g. "BrightFlash (1)").
+        // Also strips trailing ' (n)' suffixes Unity sometimes appends (e.g. "BrightFlash (1)").        
         private Transform FindChildByName(Transform root, string desiredName)
         {
             if (root == null || string.IsNullOrEmpty(desiredName)) return null;
@@ -2601,11 +2598,3 @@ namespace VoidSurvivorColorMod
         }
     }
 }
-
-/*
- * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                             ██
- * ██                             END OF GIGA MOD                                 ██
- * ██                                                                             ██
- * ████████████████████████████████████████████████████████████████████████████████
- */
