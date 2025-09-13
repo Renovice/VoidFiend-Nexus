@@ -46,7 +46,7 @@ using MonoMod.Cil;
 
 namespace SuppressRework
 {
-    [BepInPlugin("com.renovice.suppressrework", "Suppress Rework", "1.4.4")]
+    [BepInPlugin("com.renovice.suppressrework", "VoidFiend Nexus", "1.4.4")]
     [BepInDependency("com.rune580.riskofoptions")]
     [BepInDependency("com.bepis.r2api")]
     public class SuppressRework : BaseUnityPlugin
