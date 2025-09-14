@@ -2057,9 +2057,9 @@ namespace VoidSurvivorCustomFlame
 
 /*
  * ████████████████████████████████████████████████████████████████████████████████
- * ██                                                                            ██
- * ██                         MOD 6: VOID SURVIVOR BEAM IMPACT COLOR CHANGE      ██
- * ██                                                                            ██
+ * ██                                                                             ██
+ * ██                         MOD 6: VOID SURVIVOR BEAM IMPACT COLOR CHANGE                 ██
+ * ██                                                                             ██
  * ████████████████████████████████████████████████████████████████████████████████
  */
 
@@ -2290,72 +2290,14 @@ namespace VoidSurvivorColorMod
                 // Modify Point Light
                 ModifyMuzzleflashPointLight(voidSurvivorBeamMuzzleflashPrefab);
 
-                // NEW: Modify BrightFlash child in the muzzleflash prefab
-                ModifyMuzzleflashBrightFlash(voidSurvivorBeamMuzzleflashPrefab);
+                // Also modify BrightFlash particle system inside the muzzleflash prefab
+                ModifyBrightFlashParticles(voidSurvivorBeamMuzzleflashPrefab);
 
                 Logger.LogInfo("VoidSurvivorBeamMuzzleflash color modifications applied successfully!");
             }
             else
             {
                 Logger.LogError("Could not find VoidSurvivorBeamMuzzleflash prefab!");
-            }
-        }
-        // NEW: Change BrightFlash color in VoidSurvivorBeamMuzzleflash
-        private void ModifyMuzzleflashBrightFlash(GameObject prefab)
-        {
-            // Find the BrightFlash child object
-            Transform brightFlashTransform = FindChildByName(prefab.transform, "BrightFlash");
-
-            if (brightFlashTransform != null)
-            {
-                ParticleSystem particleSystem = brightFlashTransform.GetComponent<ParticleSystem>();
-
-                if (particleSystem != null)
-                {
-                    var main = particleSystem.main;
-                    // Store the original color before changing it
-                    if (!originalParticleStartColors.ContainsKey(particleSystem))
-                    {
-                        originalParticleStartColors[particleSystem] = main.startColor.color;
-                    }
-                    main.startColor = brightFlashColor;
-                    Logger.LogInfo($"Changed Muzzleflash BrightFlash particle system color from {originalParticleStartColors[particleSystem]} to {brightFlashColor}");
-
-                    // Also modify the color over lifetime module if it exists
-                    var colorOverLifetime = particleSystem.colorOverLifetime;
-                    if (colorOverLifetime.enabled)
-                    {
-                        if (!originalParticleGradients.ContainsKey(particleSystem))
-                        {
-                            originalParticleGradients[particleSystem] = colorOverLifetime.color;
-                        }
-
-                        Gradient gradient = new Gradient();
-                        GradientColorKey[] colorKeys = new GradientColorKey[2];
-                        colorKeys[0].color = brightFlashColor;
-                        colorKeys[0].time = 0.0f;
-                        colorKeys[1].color = brightFlashColor;
-                        colorKeys[1].time = 1.0f;
-
-                        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[2];
-                        alphaKeys[0].alpha = 1.0f;
-                        alphaKeys[0].time = 0.0f;
-                        alphaKeys[1].alpha = 0.0f;
-                        alphaKeys[1].time = 1.0f;
-
-                        gradient.SetKeys(colorKeys, alphaKeys);
-                        colorOverLifetime.color = gradient;
-                        Logger.LogInfo("Updated Muzzleflash BrightFlash color over lifetime gradient");
-                    }
-                }
-                else
-                {
-                    Logger.LogWarning("ParticleSystem component not found on Muzzleflash BrightFlash GameObject");
-                }
-            }
-            else
-            {
-                Logger.LogWarning("BrightFlash child object not found in VoidSurvivorBeamMuzzleflash");
             }
         }
 
@@ -2602,27 +2544,27 @@ namespace VoidSurvivorColorMod
         {
             // Clean up hooks
             On.RoR2.EffectCatalog.Init -= EffectCatalog_Init;
-
+            
             // FIX: Restore all original colors to prevent asset state pollution
             Logger.LogInfo("Restoring original colors to all modified assets...");
-            foreach (var pair in originalLightColors)
+            foreach(var pair in originalLightColors)
             {
-                if (pair.Key != null) // Check if the component hasn't been destroyed
+                if(pair.Key != null) // Check if the component hasn't been destroyed
                 {
                     pair.Key.color = pair.Value;
                 }
             }
-            foreach (var pair in originalParticleStartColors)
+            foreach(var pair in originalParticleStartColors)
             {
-                if (pair.Key != null)
+                if(pair.Key != null)
                 {
                     var main = pair.Key.main;
                     main.startColor = pair.Value;
                 }
             }
-            foreach (var pair in originalParticleGradients)
+            foreach(var pair in originalParticleGradients)
             {
-                if (pair.Key != null)
+                if(pair.Key != null)
                 {
                     var col = pair.Key.colorOverLifetime;
                     col.color = pair.Value;
@@ -2633,7 +2575,7 @@ namespace VoidSurvivorColorMod
 
         // Helper: tolerant child lookup
         // Searches all children (including inactive) and matches by name case-insensitively.
-        // Also strips trailing ' (n)' suffixes Unity sometimes appends (e.g. "BrightFlash (1)").      
+        // Also strips trailing ' (n)' suffixes Unity sometimes appends (e.g. "BrightFlash (1)").        
         private Transform FindChildByName(Transform root, string desiredName)
         {
             if (root == null || string.IsNullOrEmpty(desiredName)) return null;
