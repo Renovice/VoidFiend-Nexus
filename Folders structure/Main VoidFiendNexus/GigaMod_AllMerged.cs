@@ -958,12 +958,23 @@ namespace VoidRampSwitcher
                 harmony.PatchAll();
                 Logger.LogInfo("Ready to swap all ramps on void mode change");
             };
+
+            // Add scene change handler to restore textures
+            SceneManager.activeSceneChanged += OnActiveSceneChanged;
         }
 
         private void OnDestroy()
         {
             harmony?.UnpatchSelf();
             RestoreAllOriginalTextures();
+            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        }
+
+        // Restore original textures on scene change
+        private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+        {
+            RestoreAllOriginalTextures();
+            Logger.LogInfo("Scene changed - restored all original ramps (safety for main menu transition)");
         }
 
         private void LoadAllTextures()
@@ -1142,6 +1153,9 @@ public class VoidModeMuzzleflashPlugin : BaseUnityPlugin
         {
             Logger.LogError("Failed to load custom ramp texture. The mod will not function.");
         }
+
+        // Add scene change handler to restore texture
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
     }
 
     /// <summary>
@@ -1309,6 +1323,14 @@ public class VoidModeMuzzleflashPlugin : BaseUnityPlugin
     {
         // Always restore the original texture when the mod is unloaded
         RestoreOriginalTexture();
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    // Restore original texture on scene change
+    private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+        RestoreOriginalTexture();
+        Logger.LogInfo("Scene changed - restored original muzzleflash texture (safety for main menu transition)");
     }
 }
 
